@@ -1,24 +1,31 @@
 import 'package:flutter/material.dart';
+import 'package:poster_maker/Create_Poster/select_poster.dart';
+import 'Edit_photo/edit_photo.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
+      debugShowCheckedModeBanner: false,
       home: MainScreen(),
     );
   }
 }
 
 class MainScreen extends StatelessWidget {
+  const MainScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Four Square Buttons'),
+        title: const Text('Poster Maker'),
       ),
       body: Center(
         child: Column(
@@ -27,18 +34,50 @@ class MainScreen extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                SquareButton(color: Colors.blue, icon: Icons.home, label: 'Home'),
-                SizedBox(width: 20),
-                SquareButton(color: Colors.green, icon: Icons.search, label: 'Search'),
+                SquareButton(
+                  color: Colors.blue,
+                  icon: Icons.home,
+                  label: 'Create Poster',
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const SelectPoster(),
+                        ));
+                  },
+                ),
+                const SizedBox(width: 20),
+                SquareButton(
+                  color: Colors.green,
+                  icon: Icons.edit_location_outlined,
+                  label: 'Edit Photo',
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const EditPhoto(),
+                        ));
+                  },
+                ),
               ],
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                SquareButton(color: Colors.red, icon: Icons.favorite, label: 'Favorite'),
-                SizedBox(width: 20),
-                SquareButton(color: Colors.orange, icon: Icons.settings, label: 'Settings'),
+                SquareButton(
+                  color: Colors.red,
+                  icon: Icons.ios_share,
+                  label: 'Share Poster',
+                  onPressed: () {},
+                ),
+                const SizedBox(width: 20),
+                SquareButton(
+                  color: Colors.orange,
+                  icon: Icons.mode_edit_outline_outlined,
+                  label: 'Edit Poster',
+                  onPressed: () {},
+                ),
               ],
             ),
           ],
@@ -52,8 +91,14 @@ class SquareButton extends StatelessWidget {
   final Color color;
   final IconData icon;
   final String label;
+  final VoidCallback onPressed;
 
-  SquareButton({required this.color, required this.icon, required this.label});
+  SquareButton({
+    required this.color,
+    required this.icon,
+    required this.label,
+    required this.onPressed,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -72,9 +117,7 @@ class SquareButton extends StatelessWidget {
               color: Colors.white,
               size: 40,
             ),
-            onPressed: () {
-              // Implement button functionality here
-            },
+            onPressed: onPressed,
           ),
         ),
         SizedBox(height: 8),
