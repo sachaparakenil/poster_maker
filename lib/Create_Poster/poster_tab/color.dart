@@ -2,6 +2,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 
+import '../editor.dart';
+
 class Tab5Screen extends StatefulWidget {
   @override
   State<Tab5Screen> createState() => _Tab5ScreenState();
@@ -101,7 +103,12 @@ class _Tab5ScreenState extends State<Tab5Screen> {
                 if (kDebugMode) {
                   print(selectedColor);
                 }
-                Navigator.of(context).pop();
+                ColorizedImage(
+                  color: selectedColor, // Change the color to your desired one
+                  imagePath: 'assets/poster/2.jpg', // Provide the image path
+                );
+
+                Navigator.pop(context);
               },
               child: Text('Done'),
             ),
@@ -115,6 +122,11 @@ class _Tab5ScreenState extends State<Tab5Screen> {
   Widget build(BuildContext context) {
     return Column(
       children: [
+        ColorizedImage(
+          color: Colors.red, // Change the color to your desired one
+          imagePath: 'assets/poster/1.jpg', // Provide the image path
+        ),
+
         Expanded(
           child: GridView.builder(
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -153,5 +165,28 @@ class _Tab5ScreenState extends State<Tab5Screen> {
       ],
     );
 
+  }
+}
+
+class ColorizedImage extends StatelessWidget {
+  final Color color;
+  final String imagePath;
+
+  ColorizedImage({required this.color, required this.imagePath});
+
+  @override
+  Widget build(BuildContext context) {
+    return ColorFiltered(
+      colorFilter: ColorFilter.mode(
+        color,
+        BlendMode.srcIn,
+      ),
+      child: Image.asset(
+        imagePath,
+        fit: BoxFit.cover,
+        height: 300,
+        width: 300,
+      ),
+    );
   }
 }

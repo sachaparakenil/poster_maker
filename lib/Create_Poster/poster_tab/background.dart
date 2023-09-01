@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../editor.dart';
+
 class Tab2Screen extends StatelessWidget {
   final List<String> imagePaths = [
     'assets/poster/12.jpg',
@@ -35,7 +37,18 @@ class Tab2Screen extends StatelessWidget {
       itemBuilder: (BuildContext context, int index) {
         return Padding(
           padding: const EdgeInsets.all(8.0),
-          child: Image.asset(imagePaths[index]),
+          child: GestureDetector(
+            onTap: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ImageEditorExample(
+                      data: imagePaths[index],
+                    ),
+                  ));
+            },
+            child: Image.asset(imagePaths[index]),
+          ),
         );
       },
     );
