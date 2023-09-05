@@ -36,7 +36,7 @@ class SelectPoster extends StatelessWidget {
             Tab2Screen(),
             Tab3Screen(),
             const Tab4Screen(),
-            Tab5Screen(),
+            const Tab5Screen(),
           ],
         ),
       ),

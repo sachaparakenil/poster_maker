@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import '../editor.dart';
 
 class Tab2Screen extends StatelessWidget {

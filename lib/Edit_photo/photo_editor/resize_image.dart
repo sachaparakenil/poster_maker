@@ -1,10 +1,10 @@
 import 'dart:io';
 import 'dart:ui';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:flutter/services.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
 
 class ResizePhoto extends StatefulWidget {
@@ -33,18 +33,17 @@ class _ResizePhotoState extends State<ResizePhoto> {
 
     try {
       final appDir = await getExternalStorageDirectory();
-      final fileName = 'my_image.jpg';
+      const fileName = 'my_image.jpg';
       final savedImage = File('${appDir!.path}/$fileName');
 
       // Capture the widget as an image
       final boundary = _containerKey.currentContext!.findRenderObject()
           as RenderRepaintBoundary;
       final image = await boundary.toImage(
-          pixelRatio: 3.0); // Adjust pixelRatio as needed
+          pixelRatio: 3.0);
       final byteData = await image.toByteData(format: ImageByteFormat.png);
       final buffer = byteData!.buffer.asUint8List();
 
-      // Save the image to the gallery
       final uint8List = Uint8List.fromList(buffer);
       final result = await ImageGallerySaver.saveImage(uint8List);
 
@@ -58,7 +57,9 @@ class _ResizePhotoState extends State<ResizePhoto> {
         showImageSavedDialog('The image has been saved to the gallery.');
       }
     } catch (e) {
-      print('Error saving image: $e');
+      if (kDebugMode) {
+        print('Error saving image: $e');
+      }
       showImageSavedDialog('Error saving the image: $e');
     }
   }
@@ -68,14 +69,14 @@ class _ResizePhotoState extends State<ResizePhoto> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text('Image Saved'),
+          title: const Text('Image Saved'),
           content: Text(message),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: Text('OK'),
+              child: const Text('OK'),
             ),
           ],
         );
@@ -110,7 +111,6 @@ class _ResizePhotoState extends State<ResizePhoto> {
       body: ListView(
         children: [
           Expanded(
-            // Wrap the Column in an Expanded widget
             child: Container(
               padding: const EdgeInsets.all(30),
               child: Column(
@@ -142,7 +142,7 @@ class _ResizePhotoState extends State<ResizePhoto> {
                       pickImageFromCamera();
                     },
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 20,
                   ),
                   if (selectedImage == null) ...{
@@ -153,11 +153,11 @@ class _ResizePhotoState extends State<ResizePhoto> {
                       ),
                     )
                   } else ...{
-                    RepaintBoundary(
-                      key: _containerKey,
-                      child: Center(
+                    Center(
+                      child: RepaintBoundary(
+                        key: _containerKey,
                         child: Container(
-                          color: Colors.indigo, // Background color
+                          color: Colors.indigo,
                           height: 550,
                           width: 300,
                           child: Image.file(
@@ -167,7 +167,7 @@ class _ResizePhotoState extends State<ResizePhoto> {
                         ),
                       ),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 20,
                     ),
                     SingleChildScrollView(
@@ -175,48 +175,48 @@ class _ResizePhotoState extends State<ResizePhoto> {
                       child: Row(
                         children: [
                           Container(
-                            margin: EdgeInsets.all(8),
+                            margin: const EdgeInsets.all(8),
                             child: ElevatedButton(
                               onPressed: () {
                                 updateFit(BoxFit.fitWidth);
                               },
-                              child: Text('FitWidth'),
+                              child: const Text('FitWidth'),
                             ),
                           ),
                           Container(
-                            margin: EdgeInsets.all(8),
+                            margin: const EdgeInsets.all(8),
                             child: ElevatedButton(
                               onPressed: () {
                                 updateFit(BoxFit.fitHeight);
                               },
-                              child: Text('FitHeight'),
+                              child: const Text('FitHeight'),
                             ),
                           ),
                           Container(
-                            margin: EdgeInsets.all(8),
+                            margin: const EdgeInsets.all(8),
                             child: ElevatedButton(
                               onPressed: () {
                                 updateFit(BoxFit.scaleDown);
                               },
-                              child: Text('scaleDown'),
+                              child: const Text('scaleDown'),
                             ),
                           ),
                           Container(
-                            margin: EdgeInsets.all(8),
+                            margin: const EdgeInsets.all(8),
                             child: ElevatedButton(
                               onPressed: () {
                                 updateFit(BoxFit.contain);
                               },
-                              child: Text('Fit'),
+                              child: const Text('Fit'),
                             ),
                           ),
                           Container(
-                            margin: EdgeInsets.all(8),
+                            margin: const EdgeInsets.all(8),
                             child: ElevatedButton(
                               onPressed: () {
                                 updateFit(BoxFit.cover);
                               },
-                              child: Text('Cover'),
+                              child: const Text('Cover'),
                             ),
                           ),
                         ],
@@ -224,8 +224,8 @@ class _ResizePhotoState extends State<ResizePhoto> {
                     ),
                     ElevatedButton(
                       onPressed:
-                          saveImageToGallery, // Call the saveImage function when the button is pressed
-                      child: Text('Save Image'),
+                          saveImageToGallery,
+                      child: const Text('Save Image'),
                     ),
                   }
                 ],
@@ -237,16 +237,3 @@ class _ResizePhotoState extends State<ResizePhoto> {
     );
   }
 }
-
-/*
-Image.asset(
-'images/pexels.jpg',
-
-// Resizing the Image to the Frame Size
-fit: BoxFit.cover,
-// Alternatively, you can also try the following methods to reseize the image
-//fit: BoxFit.fitWidth,
-//fit: BoxFit.fitHeight,
-//fit: BoxFit.scaledown,
-//fit: BoxFit.fit,                   //
-)*/

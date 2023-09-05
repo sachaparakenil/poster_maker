@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:poster_maker/Create_Poster/select_poster.dart';
 import 'Edit_photo/edit_photo.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp());
 }
 
@@ -93,7 +94,7 @@ class SquareButton extends StatelessWidget {
   final String label;
   final VoidCallback onPressed;
 
-  SquareButton({
+  const SquareButton({super.key,
     required this.color,
     required this.icon,
     required this.label,
@@ -120,10 +121,10 @@ class SquareButton extends StatelessWidget {
             onPressed: onPressed,
           ),
         ),
-        SizedBox(height: 8),
+        const SizedBox(height: 8),
         Text(
           label,
-          style: TextStyle(fontSize: 16),
+          style: const TextStyle(fontSize: 16),
         ),
       ],
     );

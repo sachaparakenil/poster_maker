@@ -1,10 +1,15 @@
+import 'dart:ui';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
-
-import '../editor.dart';
+import 'package:image_editor_plus/image_editor_plus.dart';
 
 class Tab5Screen extends StatefulWidget {
+  const Tab5Screen({super.key});
+
   @override
   State<Tab5Screen> createState() => _Tab5ScreenState();
 }
@@ -85,7 +90,7 @@ class _Tab5ScreenState extends State<Tab5Screen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Pick a color'),
+          title: const Text('Pick a color'),
           content: SingleChildScrollView(
             child: ColorPicker(
               pickerColor: selectedColor,
@@ -110,7 +115,7 @@ class _Tab5ScreenState extends State<Tab5Screen> {
 
                 Navigator.pop(context);
               },
-              child: Text('Done'),
+              child: const Text('Done'),
             ),
           ],
         );
@@ -122,11 +127,6 @@ class _Tab5ScreenState extends State<Tab5Screen> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        ColorizedImage(
-          color: Colors.red, // Change the color to your desired one
-          imagePath: 'assets/poster/1.jpg', // Provide the image path
-        ),
-
         Expanded(
           child: GridView.builder(
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -135,16 +135,24 @@ class _Tab5ScreenState extends State<Tab5Screen> {
               crossAxisSpacing: 20,
             ),
             itemCount: basicColors.length,
-            padding: EdgeInsets.all(20),
+            padding: const EdgeInsets.all(20),
             itemBuilder: (BuildContext context, int index) {
-              final Color color = basicColors[index]; // Get the color from the list
+              final Color color = basicColors[index];
               return GestureDetector(
                 onTap: () {
                   setState(() {
                     selectedColor = color;
-                    if (kDebugMode) {
-                      print(selectedColor);
-                    }
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const ImageEditorColor(
+                          colorizedImage: ColorizedImage(
+                            color: Colors.red,
+                            imagePath: 'assets/poster/1.jpg',
+                          ),
+                        ),
+                      ),
+                    );
                   });
                 },
                 child: Container(
@@ -155,16 +163,14 @@ class _Tab5ScreenState extends State<Tab5Screen> {
                 ),
               );
             },
-
           ),
         ),
         ElevatedButton(
           onPressed: _openColorPicker,
-          child: Text('Pick a color'),
+          child: const Text('Pick a color'),
         ),
       ],
     );
-
   }
 }
 
@@ -172,7 +178,7 @@ class ColorizedImage extends StatelessWidget {
   final Color color;
   final String imagePath;
 
-  ColorizedImage({required this.color, required this.imagePath});
+  const ColorizedImage({super.key, required this.color, required this.imagePath});
 
   @override
   Widget build(BuildContext context) {
@@ -186,6 +192,100 @@ class ColorizedImage extends StatelessWidget {
         fit: BoxFit.cover,
         height: 300,
         width: 300,
+      ),
+    );
+  }
+}
+
+class ImageEditorColor extends StatefulWidget {
+  final ColorizedImage colorizedImage;
+
+  const ImageEditorColor({Key? key, required this.colorizedImage}) : super(key: key);
+
+  @override
+  createState() => _ImageEditorColorState();
+}
+
+class _ImageEditorColorState extends State<ImageEditorColor> {
+  Uint8List? imageData;
+  ColorizedImage? colorizedImage;
+
+  @override
+  void initState() {
+    super.initState();
+    colorizedImage = widget.colorizedImage;
+    loadImage(colorizedImage!);
+  }
+
+  void loadImage(ColorizedImage colorizedImage) async {
+    final GlobalKey boundaryKey = GlobalKey();
+
+    final imageWidget = RepaintBoundary(
+      key: boundaryKey,
+      child: ColorFiltered(
+        colorFilter: ColorFilter.mode(
+          colorizedImage.color,
+          BlendMode.srcIn,
+        ),
+        child: Image.asset(
+          colorizedImage.imagePath,
+          fit: BoxFit.cover,
+          height: 300,
+          width: 300,
+        ),
+      ),
+    );
+
+    final boundary =
+        boundaryKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
+    final imageByteData = await boundary.toImage(pixelRatio: 1.0);
+    final imageBytes =
+        await imageByteData.toByteData(format: ImageByteFormat.png);
+
+    if (imageBytes != null) {
+      setState(() {
+        imageData = imageBytes.buffer.asUint8List();
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Poster Maker"),
+        centerTitle: true,
+        actions: [
+          IconButton(
+            onPressed: () {},
+            icon: const Icon(Icons.download),
+          )
+        ],
+      ),
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          if (imageData != null) Image.memory(imageData!),
+          const SizedBox(height: 16),
+          ElevatedButton(
+            child: const Text("Poster editor"),
+            onPressed: () async {
+              var editedImage = await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ImageEditor(
+                    image: imageData,
+                  ),
+                ),
+              );
+
+              if (editedImage != null) {
+                imageData = editedImage;
+                setState(() {});
+              }
+            },
+          ),
+        ],
       ),
     );
   }

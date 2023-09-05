@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:poster_maker/Edit_photo/photo_editor/Removebg/background_remover.dart';
 import 'package:poster_maker/Edit_photo/photo_editor/resize_image.dart';
 
-import '../Create_Poster/editor.dart';
-
 class EditPhoto extends StatelessWidget {
   const EditPhoto({Key? key}) : super(key: key);
 
