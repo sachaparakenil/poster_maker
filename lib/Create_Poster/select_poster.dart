@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:poster_maker/Create_Poster/poster_tab/color.dart';
-import 'package:poster_maker/Create_Poster/poster_tab/image.dart';
 import 'package:poster_maker/Create_Poster/poster_tab/template.dart';
 import 'package:poster_maker/Create_Poster/poster_tab/background.dart';
 import 'package:poster_maker/Create_Poster/poster_tab/texture.dart';
@@ -11,7 +10,7 @@ class SelectPoster extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 5,
+      length: 4,
       child: Scaffold(
         appBar: PreferredSize(
           preferredSize: const Size.fromHeight(
@@ -24,7 +23,6 @@ class SelectPoster extends StatelessWidget {
                 Tab(text: 'Template'),
                 Tab(text: 'Background'),
                 Tab(text: 'Texture'),
-                Tab(text: 'Image'),
                 Tab(text: 'Color'),
               ],
             ),
@@ -35,8 +33,7 @@ class SelectPoster extends StatelessWidget {
             Tab1Screen(),
             Tab2Screen(),
             Tab3Screen(),
-            const Tab4Screen(),
-            const Tab5Screen(),
+            Tab4Screen(),
           ],
         ),
       ),

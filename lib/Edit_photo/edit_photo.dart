@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:poster_maker/Edit_photo/photo_editor/Removebg/background_remover.dart';
-import 'package:poster_maker/Edit_photo/photo_editor/resize_image.dart';
+import 'package:poster_maker/Edit_photo/photo_editor/helper/Removebg/background_remover.dart';
+import 'package:poster_maker/Edit_photo/photo_editor/helper/filter_image.dart';
+import 'package:poster_maker/Edit_photo/photo_editor/helper/photo_editor/image_editor.dart';
+import 'package:poster_maker/Edit_photo/photo_editor/helper/resize_image.dart';
 
 class EditPhoto extends StatelessWidget {
   const EditPhoto({Key? key}) : super(key: key);
@@ -47,13 +49,21 @@ class EditPhoto extends StatelessWidget {
               children: [
                 Button(
                     color: Colors.red,
-                    label: "Filter\nImage",
-                    onPressed: () {}),
+                    label: "Crop\nImage",
+                    onPressed: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => PhotoEditor(title: 'Title',),
+                          ));
+                    }),
                 const SizedBox(width: 20),
                 Button(
                     color: Colors.orange,
-                    label: "Rotate\nImage",
-                    onPressed: () {}),
+                    label: "Filter\nImage",
+                    onPressed: () {
+                      PreviewPage();
+                    }),
               ],
             ),
           ],
@@ -91,7 +101,10 @@ class Button extends StatelessWidget {
                   onPressed: () {
                     onPressed();
                   },
-                  child: Text(label, style: const TextStyle(color: Colors.black),))),
+                  child: Text(
+                    label,
+                    style: const TextStyle(color: Colors.black),
+                  ))),
         ),
       ],
     );

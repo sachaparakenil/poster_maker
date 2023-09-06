@@ -1,20 +1,22 @@
+import 'dart:async';
 import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
+import 'dart:typed_data';
+import 'package:flutter/rendering.dart';
+import 'dart:ui' as ui;
 import 'package:image_editor_plus/image_editor_plus.dart';
+import 'package:image_gallery_saver/image_gallery_saver.dart';
 
-class Tab5Screen extends StatefulWidget {
-  const Tab5Screen({super.key});
-
+class Tab4Screen extends StatefulWidget {
   @override
-  State<Tab5Screen> createState() => _Tab5ScreenState();
+  State<Tab4Screen> createState() => _Tab4ScreenState();
 }
 
-class _Tab5ScreenState extends State<Tab5Screen> {
+class _Tab4ScreenState extends State<Tab4Screen> {
   final List<Color> basicColors = [
     Colors.red.shade900,
     Colors.red.shade700,
@@ -82,15 +84,13 @@ class _Tab5ScreenState extends State<Tab5Screen> {
     Colors.lime.shade300,
     Colors.lime.shade100,
   ];
-
   Color selectedColor = Colors.white;
-
   void _openColorPicker() {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Pick a color'),
+          title: Text('Pick a color'),
           content: SingleChildScrollView(
             child: ColorPicker(
               pickerColor: selectedColor,
@@ -108,18 +108,33 @@ class _Tab5ScreenState extends State<Tab5Screen> {
                 if (kDebugMode) {
                   print(selectedColor);
                 }
+                Navigator.of(context).pop();
                 ColorizedImage(
-                  color: selectedColor, // Change the color to your desired one
-                  imagePath: 'assets/poster/2.jpg', // Provide the image path
+                  color: selectedColor,
+                  imagePath: 'assets/poster/2.jpg',
                 );
-
-                Navigator.pop(context);
+                loadImage();
               },
-              child: const Text('Done'),
+              child: Text('Done'),
             ),
           ],
         );
       },
+    );
+  }
+
+  Future<void> loadImage() async {
+    Uint8List? colorizedImageData = await ColorizedImage(
+      color: selectedColor,
+      imagePath: 'assets/poster/1.jpg',
+    ).generateColorizedImage();
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ImageEditorColor(
+          colorizedImage: colorizedImageData,
+        ),
+      ),
     );
   }
 
@@ -135,24 +150,18 @@ class _Tab5ScreenState extends State<Tab5Screen> {
               crossAxisSpacing: 20,
             ),
             itemCount: basicColors.length,
-            padding: const EdgeInsets.all(20),
+            padding: EdgeInsets.all(20),
             itemBuilder: (BuildContext context, int index) {
-              final Color color = basicColors[index];
+              final Color color =
+                  basicColors[index];
               return GestureDetector(
                 onTap: () {
                   setState(() {
                     selectedColor = color;
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const ImageEditorColor(
-                          colorizedImage: ColorizedImage(
-                            color: Colors.red,
-                            imagePath: 'assets/poster/1.jpg',
-                          ),
-                        ),
-                      ),
-                    );
+                    if (kDebugMode) {
+                      print(selectedColor);
+                    }
+                    loadImage();
                   });
                 },
                 child: Container(
@@ -167,7 +176,7 @@ class _Tab5ScreenState extends State<Tab5Screen> {
         ),
         ElevatedButton(
           onPressed: _openColorPicker,
-          child: const Text('Pick a color'),
+          child: Text('Pick a color'),
         ),
       ],
     );
@@ -178,29 +187,61 @@ class ColorizedImage extends StatelessWidget {
   final Color color;
   final String imagePath;
 
-  const ColorizedImage({super.key, required this.color, required this.imagePath});
+  ColorizedImage({required this.color, required this.imagePath});
+
+  Future<Uint8List> generateColorizedImage() async {
+    final completer = Completer<Uint8List>();
+
+    final recorder = ui.PictureRecorder();
+    final canvas =
+        Canvas(recorder, Rect.fromPoints(Offset(0, 0), Offset(300, 300)));
+
+    // Apply color filter to the image
+    final paint = Paint()
+      ..colorFilter = ColorFilter.mode(color, BlendMode.srcIn);
+    final image = await loadImage(imagePath);
+    canvas.drawImage(image, Offset.zero, paint);
+
+    final picture = recorder.endRecording();
+    final img = await picture.toImage(600, 900);
+    final byteData = await img.toByteData(format: ui.ImageByteFormat.png);
+
+    completer.complete(Uint8List.sublistView(byteData!.buffer.asUint8List()));
+
+    return completer.future;
+  }
+
+  Future<ui.Image> loadImage(String path) async {
+    final data = await rootBundle.load(path);
+    final codec = await ui.instantiateImageCodec(
+        Uint8List.sublistView(data.buffer.asUint8List()));
+    final frameInfo = await codec.getNextFrame();
+    return frameInfo.image;
+  }
 
   @override
   Widget build(BuildContext context) {
-    return ColorFiltered(
-      colorFilter: ColorFilter.mode(
-        color,
-        BlendMode.srcIn,
-      ),
-      child: Image.asset(
-        imagePath,
-        fit: BoxFit.cover,
-        height: 300,
-        width: 300,
-      ),
+    return FutureBuilder<Uint8List>(
+      future: generateColorizedImage(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return CircularProgressIndicator();
+        } else if (snapshot.hasError) {
+          return Text('Error: ${snapshot.error}');
+        } else if (snapshot.hasData) {
+          final Uint8List imageBytes = snapshot.data!;
+          return Image.memory(imageBytes);
+        } else {
+          return Text('No Data');
+        }
+      },
     );
   }
 }
 
 class ImageEditorColor extends StatefulWidget {
-  final ColorizedImage colorizedImage;
-
-  const ImageEditorColor({Key? key, required this.colorizedImage}) : super(key: key);
+  ImageEditorColor({Key? key, this.colorizedImage});
+  final Uint8List? colorizedImage;
 
   @override
   createState() => _ImageEditorColorState();
@@ -208,45 +249,67 @@ class ImageEditorColor extends StatefulWidget {
 
 class _ImageEditorColorState extends State<ImageEditorColor> {
   Uint8List? imageData;
-  ColorizedImage? colorizedImage;
+  final GlobalKey _containerKey = GlobalKey();
+  String? imagePath;
 
   @override
   void initState() {
     super.initState();
-    colorizedImage = widget.colorizedImage;
-    loadImage(colorizedImage!);
-  }
-
-  void loadImage(ColorizedImage colorizedImage) async {
-    final GlobalKey boundaryKey = GlobalKey();
-
-    final imageWidget = RepaintBoundary(
-      key: boundaryKey,
-      child: ColorFiltered(
-        colorFilter: ColorFilter.mode(
-          colorizedImage.color,
-          BlendMode.srcIn,
-        ),
-        child: Image.asset(
-          colorizedImage.imagePath,
-          fit: BoxFit.cover,
-          height: 300,
-          width: 300,
-        ),
-      ),
-    );
-
-    final boundary =
-        boundaryKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
-    final imageByteData = await boundary.toImage(pixelRatio: 1.0);
-    final imageBytes =
-        await imageByteData.toByteData(format: ImageByteFormat.png);
-
-    if (imageBytes != null) {
+    if (widget.colorizedImage != null) {
       setState(() {
-        imageData = imageBytes.buffer.asUint8List();
+        imageData = widget.colorizedImage;
       });
     }
+  }
+
+  Future<void> saveImageToGallery() async {
+    if (imageData == null) {
+      return;
+    }
+
+    try {
+      final boundary = _containerKey.currentContext!.findRenderObject()
+      as RenderRepaintBoundary;
+      final image = await boundary.toImage(pixelRatio: 3.0);
+      final byteData = await image.toByteData(format: ImageByteFormat.png);
+      final buffer = byteData!.buffer.asUint8List();
+
+      final result = await ImageGallerySaver.saveImage(Uint8List.fromList(buffer));
+
+      if (result != null && result.isNotEmpty) {
+        // Image saved successfully
+        showImageSavedDialog('The image has been saved to the gallery.');
+      } else {
+        // Error saving image
+        showImageSavedDialog('Failed to save the image.');
+      }
+    } catch (e) {
+      // Handle any errors that occur during the saving process
+      if (kDebugMode) {
+        print('Error saving image: $e');
+      }
+      showImageSavedDialog('Error saving the image: $e');
+    }
+  }
+
+  void showImageSavedDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Image Saved'),
+          content: Text(message),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -257,7 +320,7 @@ class _ImageEditorColorState extends State<ImageEditorColor> {
         centerTitle: true,
         actions: [
           IconButton(
-            onPressed: () {},
+            onPressed: () {saveImageToGallery();},
             icon: const Icon(Icons.download),
           )
         ],
@@ -265,7 +328,7 @@ class _ImageEditorColorState extends State<ImageEditorColor> {
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          if (imageData != null) Image.memory(imageData!),
+          if (imageData != null) RepaintBoundary(key: _containerKey,  child: Image.memory(imageData!)),
           const SizedBox(height: 16),
           ElevatedButton(
             child: const Text("Poster editor"),
@@ -279,6 +342,7 @@ class _ImageEditorColorState extends State<ImageEditorColor> {
                 ),
               );
 
+              // replace with edited image
               if (editedImage != null) {
                 imageData = editedImage;
                 setState(() {});

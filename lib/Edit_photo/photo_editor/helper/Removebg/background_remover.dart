@@ -6,9 +6,9 @@ import 'package:flutter/rendering.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:poster_maker/Edit_photo/photo_editor/Removebg/dashed_border.dart';
 import 'package:screenshot/screenshot.dart';
 import 'api.dart';
+import 'dashed_border.dart';
 
 class RemoveBg extends StatefulWidget {
   const RemoveBg({super.key});
@@ -50,11 +50,10 @@ class _RemoveBgState extends State<RemoveBg> {
       const fileName = 'my_image.jpg';
       final savedImage = File('${appDir!.path}/$fileName');
 
-      // Capture the widget as an image
       final boundary = _containerKey.currentContext!.findRenderObject()
       as RenderRepaintBoundary;
       final image = await boundary.toImage(
-          pixelRatio: 3.0); // Adjust pixelRatio as needed
+          pixelRatio: 3.0);
       final byteData = await image.toByteData(format: ImageByteFormat.png);
       final buffer = byteData!.buffer.asUint8List();
 
