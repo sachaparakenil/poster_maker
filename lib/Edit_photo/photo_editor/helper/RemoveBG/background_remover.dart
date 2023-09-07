@@ -51,9 +51,8 @@ class _RemoveBgState extends State<RemoveBg> {
       final savedImage = File('${appDir!.path}/$fileName');
 
       final boundary = _containerKey.currentContext!.findRenderObject()
-      as RenderRepaintBoundary;
-      final image = await boundary.toImage(
-          pixelRatio: 3.0);
+          as RenderRepaintBoundary;
+      final image = await boundary.toImage(pixelRatio: 3.0);
       final byteData = await image.toByteData(format: ImageByteFormat.png);
       final buffer = byteData!.buffer.asUint8List();
 

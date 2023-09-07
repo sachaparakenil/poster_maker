@@ -39,8 +39,7 @@ class _ResizePhotoState extends State<ResizePhoto> {
       // Capture the widget as an image
       final boundary = _containerKey.currentContext!.findRenderObject()
           as RenderRepaintBoundary;
-      final image = await boundary.toImage(
-          pixelRatio: 3.0);
+      final image = await boundary.toImage(pixelRatio: 3.0);
       final byteData = await image.toByteData(format: ImageByteFormat.png);
       final buffer = byteData!.buffer.asUint8List();
 
@@ -223,8 +222,7 @@ class _ResizePhotoState extends State<ResizePhoto> {
                       ),
                     ),
                     ElevatedButton(
-                      onPressed:
-                          saveImageToGallery,
+                      onPressed: saveImageToGallery,
                       child: const Text('Save Image'),
                     ),
                   }

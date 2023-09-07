@@ -81,9 +81,14 @@ class _DottedCustomPaint extends CustomPainter {
     bool draw = true;
     while (distance < path.computeMetrics().single.length) {
       final double length = draw ? dottedLength : space;
-      final double remainingLength = path.computeMetrics().single.length - distance;
-      final double segmentLength = remainingLength < length ? remainingLength : length;
-      final Path segmentPath = path.computeMetrics().single.extractPath(distance, distance + segmentLength);
+      final double remainingLength =
+          path.computeMetrics().single.length - distance;
+      final double segmentLength =
+          remainingLength < length ? remainingLength : length;
+      final Path segmentPath = path
+          .computeMetrics()
+          .single
+          .extractPath(distance, distance + segmentLength);
       if (draw) {
         canvas.drawPath(segmentPath, paint);
       }

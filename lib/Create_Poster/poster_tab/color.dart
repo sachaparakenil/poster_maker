@@ -152,8 +152,7 @@ class _Tab4ScreenState extends State<Tab4Screen> {
             itemCount: basicColors.length,
             padding: EdgeInsets.all(20),
             itemBuilder: (BuildContext context, int index) {
-              final Color color =
-                  basicColors[index];
+              final Color color = basicColors[index];
               return GestureDetector(
                 onTap: () {
                   setState(() {
@@ -269,12 +268,13 @@ class _ImageEditorColorState extends State<ImageEditorColor> {
 
     try {
       final boundary = _containerKey.currentContext!.findRenderObject()
-      as RenderRepaintBoundary;
+          as RenderRepaintBoundary;
       final image = await boundary.toImage(pixelRatio: 3.0);
       final byteData = await image.toByteData(format: ImageByteFormat.png);
       final buffer = byteData!.buffer.asUint8List();
 
-      final result = await ImageGallerySaver.saveImage(Uint8List.fromList(buffer));
+      final result =
+          await ImageGallerySaver.saveImage(Uint8List.fromList(buffer));
 
       if (result != null && result.isNotEmpty) {
         // Image saved successfully
@@ -320,7 +320,9 @@ class _ImageEditorColorState extends State<ImageEditorColor> {
         centerTitle: true,
         actions: [
           IconButton(
-            onPressed: () {saveImageToGallery();},
+            onPressed: () {
+              saveImageToGallery();
+            },
             icon: const Icon(Icons.download),
           )
         ],
@@ -328,7 +330,9 @@ class _ImageEditorColorState extends State<ImageEditorColor> {
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          if (imageData != null) RepaintBoundary(key: _containerKey,  child: Image.memory(imageData!)),
+          if (imageData != null)
+            RepaintBoundary(
+                key: _containerKey, child: Image.memory(imageData!)),
           const SizedBox(height: 16),
           ElevatedButton(
             child: const Text("Poster editor"),

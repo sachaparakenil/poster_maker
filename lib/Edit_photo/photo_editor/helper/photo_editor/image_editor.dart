@@ -129,7 +129,7 @@ class _PhotoEditorState extends State<PhotoEditor> {
               child: const Icon(Icons.crop),
             ),
           ),
-        if(_croppedFile != null)
+        if (_croppedFile != null)
           Padding(
             padding: const EdgeInsets.only(left: 32.0),
             child: FloatingActionButton(

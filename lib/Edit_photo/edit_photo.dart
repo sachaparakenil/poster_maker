@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:poster_maker/Edit_photo/photo_editor/helper/Removebg/background_remover.dart';
-import 'package:poster_maker/Edit_photo/photo_editor/helper/filter_image.dart';
+import 'package:poster_maker/Edit_photo/photo_editor/helper/Filter/filter_image.dart';
 import 'package:poster_maker/Edit_photo/photo_editor/helper/photo_editor/image_editor.dart';
 import 'package:poster_maker/Edit_photo/photo_editor/helper/resize_image.dart';
 
@@ -54,7 +54,8 @@ class EditPhoto extends StatelessWidget {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => PhotoEditor(title: 'Title',),
+                            builder: (context) =>  MyHomePage(
+                            ),
                           ));
                     }),
                 const SizedBox(width: 20),
@@ -62,7 +63,13 @@ class EditPhoto extends StatelessWidget {
                     color: Colors.orange,
                     label: "Filter\nImage",
                     onPressed: () {
-                      PreviewPage();
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const PhotoEditor(
+                              title: 'Title',
+                            ),
+                          ));
                     }),
               ],
             ),

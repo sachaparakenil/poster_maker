@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:image_editor_plus/image_editor_plus.dart';
 
 class ImageEditorExample extends StatefulWidget {
-   ImageEditorExample({super.key, required this.data});
+  ImageEditorExample({super.key, required this.data});
   final String data;
   Uint8List? imageData;
   @override
