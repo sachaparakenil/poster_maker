@@ -472,6 +472,15 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.4"
+  matrix_gesture_detector:
+    dependency: "direct main"
+    description:
+      path: "."
+      ref: HEAD
+      resolved-ref: "29a1bf818434c1f8051892c9b537ac6ef217d45d"
+      url: "https://github.com/besttechguru/matrix_gesture_detector.git"
+    source: git
+    version: "0.2.0-nullsafety"
   meta:
     dependency: transitive
     description:
